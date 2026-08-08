@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+[package]
+name = "foundation-anchor"
+version = "0.1.0"
+description = "Public ledger anchoring — Merkle root publishing for sovereign provenance (Layer 5)"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[features]
+default = []
+test-support = []
+
+[dependencies]
+blake3.workspace = true
+foundation-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tempfile = "3"

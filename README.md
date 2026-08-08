@@ -1,42 +1,52 @@
 # projectFOUNDATION
 
-The validated scientific lineage that gives sporeGarden products their
-substance. Stand up the soil — data locations, provenance targets,
-domain thread maps — so that projectNUCLEUS can grow on top and products
-can focus on what matters to their audiences.
+The gAIa substrate library — validated scientific lineage, sovereign
+publication, and radiating attribution for the ecoPrimals ecosystem.
 
 **Organization**: sporeGarden (products built on ecoPrimals)
-**Generation**: gen4 — composition and deployment (Wave 76, primalSpring v0.9.30+)
+**Generation**: gen4 — composition and deployment (Wave 76+, evolved Wave 157a)
 **License**: AGPL-3.0-or-later (code), ORC (system mechanics), CC-BY-SA 4.0 (docs)
 
 ## What This Is
 
-projectFOUNDATION is the scientific knowledge layer of the ecoPrimals ecosystem.
-It maps the complete validated lineage — 26 baseCamp companion papers
-(28 including companion hardware and coordination notes),
-8 springs + 14 primals with 41,500+ quantitative checks, 70+ reproduced papers, and
-16 faculty and community contacts — as one unified whole, organized into
-10 interconnected domain threads.
+projectFOUNDATION is evolving from "validate science" to "publish science
+as sovereign, attributed, verifiable knowledge." It is the substrate library
+for the gAIa vision: a self-owning scientific knowledge commons where
+discoveries are cryptographically attributed, publicly anchored, and
+economically distributed along sweetGrass braids.
 
 ```
-ecoPrimals (organisms) → syntheticChemistry (springs/validation) → sporeGarden (products)
-                                    ↓                                       ↓
-                            primalSpring                          projectNUCLEUS
-                         (validates compositions)          (deploys compositions)
-                                                                        ↑
-                                                          projectFOUNDATION
-                                                          (the soil: what to validate,
-                                                           where the data lives,
-                                                           what the targets are)
+                              gAIa Vision (endgame)
+                                     ↑
+                    ┌────────────────┼────────────────┐
+                    │                │                │
+              sunCloud          Public Anchor     CAS Federation
+          (Layer 6: value    (Layer 5: BTC/ETH   (Layer 0: cross-gate
+           radiates along     32-byte Merkle      content.locate for
+           braids)            root = postage)     data + compute)
+                    │                │                │
+                    └────────────────┼────────────────┘
+                                     │
+                          projectFOUNDATION
+                     (data catalog, validation,
+                      provenance pipeline, IPC,
+                      fetch, publish, anchor)
+                                     │
+                    ┌────────────────┼────────────────┐
+                    │                │                │
+              westGate          strandGate        ironGate
+           (data CAS:        (compute NFT:     (NUCLEUS host:
+            50 TB ZFS,        SU(3)/SU(4),      integration +
+            153 datasets)     memoized configs)  publication)
 ```
 
 projectNUCLEUS defines HOW to deploy (primals, graphs, gates).
-projectFOUNDATION defines WHAT to validate (data, papers, targets, threads).
-Products define WHO benefits (helixVision for biologists, esotericWebb
-for creators, blueFish for labs).
+projectFOUNDATION defines WHAT to validate and HOW to publish
+(data, targets, provenance, attribution, anchoring).
+Products define WHO benefits (helixVision, esotericWebb, blueFish).
 
-The foundation is the soil. NUCLEUS is the spore that grows on top.
-Products are the fruiting bodies.
+The foundation is the soil. The sovereignty stack grows on top.
+gAIa is the fruit.
 
 ## One Foundation, Many Expressions
 
@@ -116,22 +126,26 @@ target/release/foundation profiles --scan-dir ../../springs/hotSpring --spring h
 target/release/foundation check-versions --eco-root ../../ --json
 ```
 
-**Current state**: 6 crates, 173 tests, 9.2k lines, 3.1MB binary, zero clippy warnings.
-8 subcommands. Zero `Result<_, String>` — all errors are typed (`FetchError`, `ProcessError`,
-`CoreError`, `IpcError`, `CliError`). Zero `unreachable!()`, `todo!()`, `unimplemented!()`
-in production. All constants centralized (RPC methods, paths, primal slugs, URLs).
-IPC phases wired with graceful degradation. Type-safe enums for execution, isolation,
-skip conditions. `Cow<str>` zero-copy env expansion. Zero-copy `Observation` types for
-comparison. `Display` impls on all report structs (`DriftReport`, `HealthTriad`,
-`CommitResult`, `SessionStatus`). Sync CLI with async isolated to `validate` only.
-sporePrint gallery generation from pseudoSpore registry. Domain profile indexing across
-springs. Automated drift detection via `check-versions`. Ecosystem health dashboard data
-model for JSON-RPC exposure (petalTongue/sporePrint consumption). GuideStone boundary
-specification for cross-gate validation ownership (updated for Wave 76 trust infrastructure).
+**Current state**: 7 crates, 254 tests, ~11.2k lines, zero clippy warnings.
+8 subcommands (9th `anchor` in design). Typed errors throughout. All constants
+centralized. IPC with graceful degradation. Zero-copy env expansion and observation
+types. Ecosystem health dashboard model. GuideStone boundary spec. CAS federation
+client patterns for cross-gate `content.locate` (westGate data + strandGate compute).
+Two external deps eliminated this wave (`bytes`, `walkdir` replaced with `std`).
+Env-driven URL resolution (no hardcoded service endpoints). Zero `unsafe` in
+production; test-only env manipulation isolated with `#[expect]` + mutex.
+
+**Evolving**: The gAIa substrate adds three capabilities:
+- **Layer 5** (`foundation-anchor`): Public ledger anchoring — aggregate N
+  loamSpine certificates into Merkle tree, write 32-byte root to BTC/ETH
+- **Layer 6** (`foundation-publish` extension): sunCloud radiating attribution —
+  read sweetGrass braids, calculate attribution shares, emit distribution manifests
+- **Layer 0** (`foundation-ipc` extension): CAS federation — cross-gate
+  `content.locate` for westGate data CAS and strandGate compute memoization
 
 **Phase C remaining**: NestGate registration, toadStool dispatch, full `ProvenanceSession`
 trio, `backfill --write` TOML mutation, database-specific fetch orchestration, sporePrint
-notify trigger from `publish`, bidirectional Forgejo mirror.
+notify trigger from `publish`.
 
 ### Bash pipeline (canonical — production, pre-Phase C cutover)
 
@@ -152,53 +166,48 @@ provenance chain (rhizoCrypt DAG + loamSpine ledger + sweetGrass braid).
 
 See `deploy/README.md` for full options and the sediment layer model.
 
+## The Sovereignty Stack
+
+projectFOUNDATION implements layers 0-6 of the gAIa sovereignty stack:
+
+| Layer | Primal | FOUNDATION Crate | Status |
+|-------|--------|-----------------|--------|
+| 0 | nestGate CAS — content identity (BLAKE3) | `foundation-fetch` | LIVE |
+| 1 | rhizoCrypt DAG — ephemeral working memory | `foundation-ipc` | LIVE |
+| 2 | loamSpine ledger — permanent record | `foundation-ipc` | LIVE |
+| 3 | sweetGrass braids — attribution | `foundation-ipc` | LIVE |
+| 4 | BearDog signatures — cryptographic proof | `foundation-ipc` | LIVE |
+| 5 | Public anchor — BTC/ETH 32-byte timestamp | `foundation-anchor` | Design |
+| 6 | sunCloud — value radiates along braids | `foundation-publish` | Design |
+
 ## Repo Structure
 
 ```
-crates/             Rust workspace — foundation UniBin (ecoBin-compliant)
-  foundation-core/    Types, TOML parsing, config discovery, env expansion
-  foundation-ipc/     JSON-RPC 2.0 clients, health triad, provenance sessions
-  foundation-fetch/   Manifest-driven fetch, BLAKE3 content addressing, registry
-  foundation-validate/ 8-phase pipeline, comparison, execution, reporting
-  foundation-publish/ sporePrint gallery generation, pseudoSpore catalog, domain profiles
-  foundation-cli/     UniBin entry: validate, fetch, health, targets, backfill, publish, profiles, check-versions
-Cargo.toml          Workspace root (edition 2024, AGPL-3.0, clippy pedantic+nursery)
-lineage/            The unified lineage — master map and thread index
-  THE_UNIFIED_LINEAGE.md    Master document: 10 threads, all papers/springs/contacts
-  THREAD_INDEX.toml         Machine-readable inventory for tooling
-  BASECAMP_PAPER_MAP.toml   baseCamp papers → threads, springs, data anchors
-expressions/        Domain thread expression documents
-  ABG_WHOLE_CELL_REBUILD.md Thread 1: whole-cell modeling (first expression)
-data/               Data source manifests and validation targets
-  sources/          Per-thread data source TOMLs (11 files, 165 sources, 10 BLAKE3-anchored)
-  targets/          Per-thread validation target TOMLs (11 files, 185 targets)
-graphs/             Foundation-specific deploy graphs (references projectNUCLEUS)
-deploy/             Operational scripts (production-canonical until Phase C cutover)
-  lib/              Sourced shell libraries (6 modules)
-    env.sh              Centralized env bootstrap (ECOPRIMALS_ROOT, SPRINGS_ROOT, FAMILY_ID)
-    primal_ipc.sh     Primal discovery, RPC clients, blake3_hash
-    json_rpc.sh       Typed JSON-RPC response parsing
-    thread_registry.sh  Runtime thread metadata from THREAD_INDEX.toml
-    target_compare.sh   Phase 6 target comparison logic
-    report_writer.sh    Phase 8 report generation and spring distribution
-  discovery_defaults.toml  Bootstrap port defaults (single source of truth)
-  fetch_sources.sh  Fetch NCBI/UniProt/KEGG data, compute BLAKE3 hashes
-  backfill_hashes.sh  Compute BLAKE3 hashes and update source TOMLs
-  foundation_validate.sh  Full validation pipeline with provenance wrapping
-sporeprint/         sporePrint content — validation summary + generated pseudoSpore gallery
-workloads/          toadStool-executable workload definitions (29 workloads, 10 threads)
-benchmarks/         barraCuda CPU parity baselines (6 scripts, 32 test cases)
-specs/              Contracts and authoring guides
-validation/         Validation results, provenance manifests, gap reports
-  <spring>/<date>/  Spring-oriented dated folders (per PROVENANCE_FOLDER_CONVENTION.md)
-  wetSpring/braids/  Ferment transcript braids (computation-verified provenance)
-  handbacks/        Geological record from projectNUCLEUS deployment validation
-  COMPOSITION_GAPS.md  Composition-level capability mismatches (Wave 20 resolutions marked)
-docs/               External-facing primers and guides
-  FOUNDATION_PRIMER.md  projectFOUNDATION orientation and thread map
-  BONDING_MODELS.md Atomic bonding architecture (covalent/ionic/metallic)
-  DEGRADATION_BEHAVIOR.md  Pipeline degradation matrix (per ecosystem standard)
-  NUCLEUS_PRIMER.md Ecosystem primer — orientation for new contributors
+crates/               Rust workspace — gAIa substrate library (ecoBin-compliant)
+  foundation-core/      Types, TOML parsing, config discovery, env expansion
+  foundation-ipc/       JSON-RPC 2.0 clients, health triad, provenance sessions,
+                        CAS federation client (content.locate cross-gate)
+  foundation-fetch/     Manifest-driven fetch, BLAKE3 content addressing, registry
+  foundation-validate/  8-phase pipeline, comparison, execution, reporting
+  foundation-publish/   Publication bridge, sporePrint gallery, sunCloud attribution
+  foundation-anchor/    Public ledger anchoring — Merkle root to BTC/ETH (Layer 5)
+  foundation-cli/       UniBin entry: validate, fetch, health, targets, backfill,
+                        publish, profiles, check-versions, anchor
+Cargo.toml            Workspace root (edition 2024, AGPL-3.0, clippy pedantic+nursery)
+data/                 Data source manifests and validation targets (core identity)
+  sources/            Per-thread data source TOMLs (11 files, 165 sources)
+  targets/            Per-thread validation target TOMLs (11 files, 185 targets)
+  data_catalog.toml   Master catalog (38 datasets / 362 GB / 17 domains)
+graphs/               Foundation-specific deploy graphs (references projectNUCLEUS)
+deploy/               Operational scripts (retiring — Phase C Rust parity in progress)
+specs/                Contracts, boundary specs, hand-off map, gAIa substrate spec
+validation/           Results, braids, gap reports (geological record)
+docs/                 External-facing primers and guides
+lineage/              Thread index + paper map (handing off to sporePrint)
+expressions/          Domain thread docs (handing off to spring teams)
+workloads/            toadStool workload TOMLs (handing off to spring teams)
+benchmarks/           barraCuda CPU parity (handing off to barraCuda)
+sporeprint/           Gallery content (handing off to lithoSpore)
 ```
 
 ## Relationship to Other Repos
@@ -210,7 +219,7 @@ docs/               External-facing primers and guides
 | **plasmidBin** | ecoPrimals/infra | Binary depot — foundation validation runs use primals from here |
 | **primalSpring** | syntheticChemistry | Composition validation — foundation references validated graphs |
 | **wateringHole** | ecoPrimals/infra | Standards and guidance — foundation follows these |
-| **whitePaper** | ecoPrimals/infra | Historical lineage — gen4/foundations/ is the personal record; this repo is the living expression |
+| **whitePaper** | ecoPrimals/infra | gAIa vision, sunCloud economics, sovereignty stack design (gen0-gen4) |
 | **helixVision** | sporeGarden | Product focus — pulls Threads 1, 3, 4, 5 from foundation |
 | **blueFish** | sporeGarden (pending) | Product focus — pulls Thread 4 + data pipeline from foundation |
 | **esotericWebb** | sporeGarden | Product focus — pulls Thread 9 from foundation |

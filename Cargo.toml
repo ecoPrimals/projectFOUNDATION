@@ -7,18 +7,18 @@ members = [
     "crates/foundation-fetch",
     "crates/foundation-validate",
     "crates/foundation-publish",
+    "crates/foundation-anchor",
     "crates/foundation-cli",
 ]
 
 [workspace.package]
 edition = "2024"
 license = "AGPL-3.0-or-later"
-repository = "https://github.com/ecoPrimals/projectFOUNDATION"
+repository = "https://git.primals.eco/sporeGarden/projectFOUNDATION"
 rust-version = "1.85"
 
 [workspace.dependencies]
 blake3 = { version = "1", default-features = false, features = ["std", "pure"] }
-bytes = "1"
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -28,13 +28,13 @@ toml = "0.8"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 ureq = { version = "3", default-features = false }
-walkdir = "2"
 
 foundation-core = { path = "crates/foundation-core" }
 foundation-ipc = { path = "crates/foundation-ipc" }
 foundation-fetch = { path = "crates/foundation-fetch" }
 foundation-validate = { path = "crates/foundation-validate" }
 foundation-publish = { path = "crates/foundation-publish" }
+foundation-anchor = { path = "crates/foundation-anchor" }
 
 [workspace.lints.rust]
 unsafe_code = "deny"

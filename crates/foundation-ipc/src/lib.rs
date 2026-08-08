@@ -9,6 +9,7 @@
 pub mod client;
 pub mod dashboard;
 pub mod error;
+pub mod federation;
 pub mod health;
 pub mod methods;
 pub mod protocol;
@@ -18,6 +19,7 @@ pub mod transport;
 pub use client::PrimalClient;
 pub use dashboard::EcosystemHealth;
 pub use error::{DegradationLevel, IpcError, IpcPhase, PhasedIpcError};
+pub use federation::{CasStats, GateLocation, LocateResult, PullReceipt};
 pub use health::{HealthStatus, HealthTriad};
 pub use provenance::ProvenanceSession;
 pub use transport::TransportLayer;

@@ -44,6 +44,18 @@ pub mod family {
     pub const ID: &str = "family.id";
 }
 
+/// Content-addressed storage methods (nestGate CAS federation).
+pub mod content {
+    /// Locate content across the gate mesh by BLAKE3 hash.
+    pub const LOCATE: &str = "content.locate";
+    /// Pull content from a remote gate into local CAS.
+    pub const REPLICATE_PULL: &str = "content.replicate.pull";
+    /// Register a local artifact in the CAS index.
+    pub const REGISTER: &str = "content.register";
+    /// Query CAS statistics (object count, size, namespaces).
+    pub const STATS: &str = "content.stats";
+}
+
 /// Foundation-specific methods (this primal's own interface).
 pub mod foundation {
     /// Query ecosystem health data.
@@ -66,6 +78,10 @@ mod tests {
             entry::CREATE,
             entry::APPEND,
             braid::CREATE,
+            content::LOCATE,
+            content::REPLICATE_PULL,
+            content::REGISTER,
+            content::STATS,
             family::ID,
             foundation::ECOSYSTEM_HEALTH,
         ] {
@@ -91,6 +107,14 @@ mod tests {
     }
 
     #[test]
+    fn content_methods_share_prefix() {
+        assert!(content::LOCATE.starts_with("content."));
+        assert!(content::REPLICATE_PULL.starts_with("content."));
+        assert!(content::REGISTER.starts_with("content."));
+        assert!(content::STATS.starts_with("content."));
+    }
+
+    #[test]
     fn no_duplicate_method_names() {
         let all = [
             health::LIVENESS,
@@ -102,6 +126,10 @@ mod tests {
             entry::CREATE,
             entry::APPEND,
             braid::CREATE,
+            content::LOCATE,
+            content::REPLICATE_PULL,
+            content::REGISTER,
+            content::STATS,
             family::ID,
             foundation::ECOSYSTEM_HEALTH,
         ];

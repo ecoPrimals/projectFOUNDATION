@@ -1,5 +1,10 @@
 # deploy/
 
+> **Status**: Transitional — these bash scripts are the production pipeline
+> (Phase B). The Rust UniBin (`foundation` CLI, Phase C) is progressively
+> replacing them. See `specs/HANDOFF_MAP.md` for the retirement schedule.
+> These scripts remain canonical until Phase C parity is reached.
+
 Operational scripts for launching foundation validation runs.
 
 ## Quick Start

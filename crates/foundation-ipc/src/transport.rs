@@ -7,7 +7,6 @@
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use bytes::Bytes;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{TcpStream, UnixStream};
 use tokio::time::timeout;
@@ -99,14 +98,14 @@ impl TransportLayer {
     }
 
     /// Low-level send/receive over the selected transport.
-    async fn send_recv(&self, request_bytes: &[u8]) -> Result<Bytes, IpcError> {
+    async fn send_recv(&self, request_bytes: &[u8]) -> Result<Vec<u8>, IpcError> {
         match self {
             Self::Uds { path } => Self::uds_send_recv(path, request_bytes).await,
             Self::Tcp { host, port } => Self::tcp_send_recv(host, *port, request_bytes).await,
         }
     }
 
-    async fn uds_send_recv(path: &Path, request_bytes: &[u8]) -> Result<Bytes, IpcError> {
+    async fn uds_send_recv(path: &Path, request_bytes: &[u8]) -> Result<Vec<u8>, IpcError> {
         let label = format!("UDS:{}", path.display());
         let io_err = |e: std::io::Error| IpcError::Io {
             transport: label.clone(),
@@ -126,10 +125,10 @@ impl TransportLayer {
             .await
             .map_err(io_err)?;
 
-        Ok(Bytes::from(line))
+        Ok(line)
     }
 
-    async fn tcp_send_recv(host: &str, port: u16, request_bytes: &[u8]) -> Result<Bytes, IpcError> {
+    async fn tcp_send_recv(host: &str, port: u16, request_bytes: &[u8]) -> Result<Vec<u8>, IpcError> {
         let addr = format!("{host}:{port}");
         let label = format!("TCP:{addr}");
         let io_err = |e: std::io::Error| IpcError::Io {
@@ -150,7 +149,7 @@ impl TransportLayer {
             .await
             .map_err(io_err)?;
 
-        Ok(Bytes::from(line))
+        Ok(line)
     }
 }
 

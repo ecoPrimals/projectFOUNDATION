@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Artifact registry — walk fetched data and compute BLAKE3 content addresses.
 //!
-//! Currently performs local-only scanning. `NestGate` RPC registration is a Phase C target.
+//! Uses `std::fs` recursive traversal (zero external deps) instead of `walkdir`.
+//! `NestGate` RPC registration is a Phase C target.
 
 use std::path::{Path, PathBuf};
 
 use foundation_core::CoreError;
 use tracing::{debug, info};
-use walkdir::WalkDir;
 
 use crate::hasher;
 
@@ -35,16 +35,34 @@ impl ArtifactRegistry {
     /// Returns [`CoreError::Io`] if the directory cannot be traversed.
     pub fn scan(data_dir: &Path) -> Result<Self, CoreError> {
         let mut artifacts = Vec::new();
+        Self::walk_recursive(data_dir, &mut artifacts);
+        info!(count = artifacts.len(), "artifact scan complete");
+        Ok(Self { artifacts })
+    }
 
-        for entry in WalkDir::new(data_dir)
-            .follow_links(false)
-            .into_iter()
-            .filter_map(Result::ok)
-            .filter(|e| e.file_type().is_file())
-        {
-            let path = entry.path().to_path_buf();
+    fn walk_recursive(dir: &Path, artifacts: &mut Vec<Artifact>) {
+        let entries = match std::fs::read_dir(dir) {
+            Ok(entries) => entries,
+            Err(e) => {
+                tracing::warn!(dir = %dir.display(), error = %e, "cannot read directory");
+                return;
+            }
+        };
+
+        for entry in entries.filter_map(Result::ok) {
+            let path = entry.path();
+            if path.is_symlink() {
+                continue;
+            }
+            if path.is_dir() {
+                Self::walk_recursive(&path, artifacts);
+                continue;
+            }
+            if !path.is_file() {
+                continue;
+            }
+
             let size = entry.metadata().map_or(0, |m| m.len());
-
             match hasher::blake3_file(&path) {
                 Ok(hash) => {
                     debug!(path = %path.display(), hash = %&hash[..12], "registered artifact");
@@ -59,9 +77,6 @@ impl ArtifactRegistry {
                 }
             }
         }
-
-        info!(count = artifacts.len(), "artifact scan complete");
-        Ok(Self { artifacts })
     }
 
     /// Get all discovered artifacts.

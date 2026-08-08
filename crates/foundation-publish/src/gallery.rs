@@ -28,8 +28,8 @@ impl Default for GalleryConfig {
     fn default() -> Self {
         Self {
             output_dir: PathBuf::from(foundation_core::paths::conventions::SPOREPRINT_SPORES),
-            download_base_url: String::from(crate::urls::DOWNLOAD_BASE),
-            forgejo_base_url: String::from(crate::urls::FORGEJO_BASE),
+            download_base_url: crate::urls::download_base(),
+            forgejo_base_url: crate::urls::forgejo_base(),
         }
     }
 }
@@ -155,9 +155,14 @@ impl GalleryGenerator {
             "receipts are content-addressed via BLAKE3 and registered in NestGate."
         );
         let _ = writeln!(page);
+        let download_host = self
+            .config
+            .download_base_url
+            .trim_start_matches("https://")
+            .trim_start_matches("http://");
         let _ = writeln!(
             page,
-            "To reproduce locally: `litho fetch --from primals.eco/lab/spores/{slug}`"
+            "To reproduce locally: `litho fetch --from {download_host}/{slug}`"
         );
 
         page
