@@ -15,27 +15,81 @@ pub mod health {
 }
 
 /// DAG / provenance methods (rhizoCrypt).
+///
+/// Verified against rhizoCrypt capability.list on ironGate (Aug 9, 2026).
 pub mod dag {
     /// Create a new DAG session.
     pub const SESSION_CREATE: &str = "dag.session.create";
-    /// Commit a DAG session (gate-level commit).
-    pub const SESSION_COMMIT: &str = "dag.session.commit";
-    /// Complete/finalize a DAG session with merkle root.
-    pub const SESSION_COMPLETE: &str = "dag.session.complete";
+    /// Get an existing DAG session.
+    pub const SESSION_GET: &str = "dag.session.get";
+    /// List all DAG sessions.
+    pub const SESSION_LIST: &str = "dag.session.list";
+    /// Discard a DAG session.
+    pub const SESSION_DISCARD: &str = "dag.session.discard";
+    /// Compute the tree hash for a session (finalization).
+    pub const SESSION_TREE_HASH: &str = "dag.session.tree_hash";
+    /// Append an event to the DAG.
+    pub const EVENT_APPEND: &str = "dag.event.append";
+    /// Compute Merkle root of the DAG.
+    pub const MERKLE_ROOT: &str = "dag.merkle.root";
+    /// Generate a Merkle proof.
+    pub const MERKLE_PROOF: &str = "dag.merkle.proof";
+    /// Verify a Merkle proof.
+    pub const MERKLE_VERIFY: &str = "dag.merkle.verify";
 }
 
 /// Spine / ledger methods (loamSpine).
-pub mod entry {
-    /// Create a new ledger entry.
-    pub const CREATE: &str = "entry.create";
-    /// Append data to an existing entry.
-    pub const APPEND: &str = "entry.append";
+///
+/// Verified against loamSpine capability.list on ironGate (Aug 9, 2026).
+pub mod spine {
+    /// Create a new spine (ledger).
+    pub const CREATE: &str = "spine.create";
+    /// Get a spine by ID.
+    pub const GET: &str = "spine.get";
+    /// List all spines.
+    pub const LIST: &str = "spine.list";
+    /// Seal a spine (make immutable).
+    pub const SEAL: &str = "spine.seal";
 }
 
-/// Braid / attribution methods (sweetGrass).
+/// Entry methods (loamSpine ledger entries).
+pub mod entry {
+    /// Append data to a spine entry.
+    pub const APPEND: &str = "entry.append";
+    /// Get a spine entry.
+    pub const GET: &str = "entry.get";
+    /// Get the tip (latest) entry.
+    pub const GET_TIP: &str = "entry.get_tip";
+    /// List entries in a spine.
+    pub const LIST: &str = "entry.list";
+}
+
+/// Session commit (loamSpine — commits a DAG session to permanent ledger).
+pub mod session {
+    /// Commit a session to the permanent ledger.
+    pub const COMMIT: &str = "session.commit";
+}
+
+/// Braid / attribution methods (loamSpine hosts braid.commit).
+///
+/// Note: sweetGrass requires riboCipher signal prefix for direct access.
+/// loamSpine exposes `braid.commit` as the primary integration surface.
 pub mod braid {
-    /// Create an attribution braid linking DAG + spine + attestation.
-    pub const CREATE: &str = "braid.create";
+    /// Commit an attribution braid (DAG + spine + attestation).
+    pub const COMMIT: &str = "braid.commit";
+}
+
+/// Anchor methods (loamSpine — Layer 5 public ledger anchoring).
+///
+/// Verified against loamSpine capability.list on ironGate (Aug 9, 2026).
+/// These are the actual RPC interface for foundation-anchor's chain backends.
+pub mod anchor {
+    /// Publish a Merkle root to public chain.
+    pub const PUBLISH: &str = "anchor.publish";
+    /// Publish a batch of Merkle roots.
+    pub const PUBLISH_BATCH: &str = "anchor.publish_batch";
+    /// Verify an anchor receipt against the chain.
+    pub const VERIFY: &str = "anchor.verify";
 }
 
 /// Family/composition identity methods (discovery meta-primal).
@@ -44,16 +98,48 @@ pub mod family {
     pub const ID: &str = "family.id";
 }
 
-/// Content-addressed storage methods (nestGate CAS federation).
+/// Content-addressed storage methods (nestGate CAS).
+///
+/// Verified against nestGate capability.list on ironGate (Aug 9, 2026).
+/// Method names aligned to actual shipped API (self-audit Wave 157a).
 pub mod content {
-    /// Locate content across the gate mesh by BLAKE3 hash.
-    pub const LOCATE: &str = "content.locate";
+    /// Resolve content location by BLAKE3 hash (mesh-wide lookup).
+    pub const RESOLVE: &str = "content.resolve";
+    /// Store content in CAS by BLAKE3 hash.
+    pub const PUT: &str = "content.put";
+    /// Retrieve content from CAS by BLAKE3 hash.
+    pub const GET: &str = "content.get";
+    /// Check if content exists in CAS.
+    pub const EXISTS: &str = "content.exists";
+    /// List content in CAS.
+    pub const LIST: &str = "content.list";
     /// Pull content from a remote gate into local CAS.
     pub const REPLICATE_PULL: &str = "content.replicate.pull";
-    /// Register a local artifact in the CAS index.
-    pub const REGISTER: &str = "content.register";
-    /// Query CAS statistics (object count, size, namespaces).
-    pub const STATS: &str = "content.stats";
+    /// Publish content (make available for federation).
+    pub const PUBLISH: &str = "content.publish";
+    /// Push content to a remote gate.
+    pub const PUSH: &str = "content.push";
+}
+
+/// Storage methods (nestGate low-level storage layer).
+pub mod storage {
+    /// Query storage statistics (object count, size, namespaces).
+    pub const STATS: &str = "storage.stats";
+    /// List namespaces in storage.
+    pub const NAMESPACES_LIST: &str = "storage.namespaces.list";
+}
+
+/// Crypto methods (bearDog).
+///
+/// Verified against bearDog capability.list on ironGate (Aug 9, 2026).
+/// Note: P0-A reports depot binary may be a stub — verify signing works.
+pub mod crypto {
+    /// Sign data with Ed25519.
+    pub const SIGN_ED25519: &str = "crypto.sign_ed25519";
+    /// Verify an Ed25519 signature.
+    pub const VERIFY_ED25519: &str = "crypto.verify_ed25519";
+    /// Compute BLAKE3 hash.
+    pub const BLAKE3_HASH: &str = "crypto.blake3_hash";
 }
 
 /// Foundation-specific methods (this primal's own interface).
@@ -66,25 +152,54 @@ pub mod foundation {
 mod tests {
     use super::*;
 
-    #[test]
-    fn method_names_follow_domain_verb_convention() {
-        for method in [
+    fn all_methods() -> Vec<&'static str> {
+        vec![
             health::LIVENESS,
             health::READINESS,
             health::CHECK,
             dag::SESSION_CREATE,
-            dag::SESSION_COMMIT,
-            dag::SESSION_COMPLETE,
-            entry::CREATE,
+            dag::SESSION_GET,
+            dag::SESSION_LIST,
+            dag::SESSION_DISCARD,
+            dag::SESSION_TREE_HASH,
+            dag::EVENT_APPEND,
+            dag::MERKLE_ROOT,
+            dag::MERKLE_PROOF,
+            dag::MERKLE_VERIFY,
+            spine::CREATE,
+            spine::GET,
+            spine::LIST,
+            spine::SEAL,
             entry::APPEND,
-            braid::CREATE,
-            content::LOCATE,
+            entry::GET,
+            entry::GET_TIP,
+            entry::LIST,
+            session::COMMIT,
+            braid::COMMIT,
+            anchor::PUBLISH,
+            anchor::PUBLISH_BATCH,
+            anchor::VERIFY,
+            content::RESOLVE,
+            content::PUT,
+            content::GET,
+            content::EXISTS,
+            content::LIST,
             content::REPLICATE_PULL,
-            content::REGISTER,
-            content::STATS,
+            content::PUBLISH,
+            content::PUSH,
+            storage::STATS,
+            storage::NAMESPACES_LIST,
+            crypto::SIGN_ED25519,
+            crypto::VERIFY_ED25519,
+            crypto::BLAKE3_HASH,
             family::ID,
             foundation::ECOSYSTEM_HEALTH,
-        ] {
+        ]
+    }
+
+    #[test]
+    fn method_names_follow_domain_verb_convention() {
+        for method in all_methods() {
             assert!(
                 method.contains('.'),
                 "method '{method}' must follow domain.verb convention"
@@ -101,38 +216,54 @@ mod tests {
 
     #[test]
     fn dag_methods_share_prefix() {
-        assert!(dag::SESSION_CREATE.starts_with("dag."));
-        assert!(dag::SESSION_COMMIT.starts_with("dag."));
-        assert!(dag::SESSION_COMPLETE.starts_with("dag."));
+        for m in [
+            dag::SESSION_CREATE,
+            dag::SESSION_GET,
+            dag::SESSION_LIST,
+            dag::SESSION_DISCARD,
+            dag::SESSION_TREE_HASH,
+            dag::EVENT_APPEND,
+            dag::MERKLE_ROOT,
+            dag::MERKLE_PROOF,
+            dag::MERKLE_VERIFY,
+        ] {
+            assert!(m.starts_with("dag."), "'{m}' must start with dag.");
+        }
     }
 
     #[test]
     fn content_methods_share_prefix() {
-        assert!(content::LOCATE.starts_with("content."));
-        assert!(content::REPLICATE_PULL.starts_with("content."));
-        assert!(content::REGISTER.starts_with("content."));
-        assert!(content::STATS.starts_with("content."));
+        for m in [
+            content::RESOLVE,
+            content::PUT,
+            content::GET,
+            content::EXISTS,
+            content::LIST,
+            content::REPLICATE_PULL,
+            content::PUBLISH,
+            content::PUSH,
+        ] {
+            assert!(m.starts_with("content."), "'{m}' must start with content.");
+        }
+    }
+
+    #[test]
+    fn anchor_methods_share_prefix() {
+        assert!(anchor::PUBLISH.starts_with("anchor."));
+        assert!(anchor::PUBLISH_BATCH.starts_with("anchor."));
+        assert!(anchor::VERIFY.starts_with("anchor."));
+    }
+
+    #[test]
+    fn crypto_methods_share_prefix() {
+        assert!(crypto::SIGN_ED25519.starts_with("crypto."));
+        assert!(crypto::VERIFY_ED25519.starts_with("crypto."));
+        assert!(crypto::BLAKE3_HASH.starts_with("crypto."));
     }
 
     #[test]
     fn no_duplicate_method_names() {
-        let all = [
-            health::LIVENESS,
-            health::READINESS,
-            health::CHECK,
-            dag::SESSION_CREATE,
-            dag::SESSION_COMMIT,
-            dag::SESSION_COMPLETE,
-            entry::CREATE,
-            entry::APPEND,
-            braid::CREATE,
-            content::LOCATE,
-            content::REPLICATE_PULL,
-            content::REGISTER,
-            content::STATS,
-            family::ID,
-            foundation::ECOSYSTEM_HEALTH,
-        ];
+        let all = all_methods();
         for (i, a) in all.iter().enumerate() {
             for b in &all[i + 1..] {
                 assert_ne!(a, b, "duplicate method name: {a}");

@@ -120,7 +120,7 @@ pub async fn commit_session(
 
     match client
         .call_raw(
-            foundation_ipc::methods::dag::SESSION_COMMIT,
+            foundation_ipc::methods::session::COMMIT,
             Some(serde_json::json!({
                 "session_id": session_id,
                 "gate": gate_name,

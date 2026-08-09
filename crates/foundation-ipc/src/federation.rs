@@ -4,12 +4,14 @@
 //! Enables any gate to locate and pull content from the mesh without knowing
 //! which gate hosts it. The resolution chain:
 //!
-//! 1. Local nestGate CAS lookup (fast path)
-//! 2. `content.locate` via songBird federation (mesh-wide hash query)
+//! 1. Local nestGate CAS lookup via `content.exists` (fast path)
+//! 2. `content.resolve` via songBird federation (mesh-wide hash query)
 //! 3. `content.replicate.pull` from the discovered gate
 //!
+//! Method names verified against nestGate v0.5.0 capability.list on ironGate
+//! (self-audit Aug 9, 2026 — Wave 157a VERTEBRATE EVOLUTION).
+//!
 //! This is Layer 0 of the gAIa sovereignty stack extended across gates.
-//! Depends on NG-05 (nestGate TCP transport + content capability registration).
 
 use serde::{Deserialize, Serialize};
 
@@ -108,6 +110,10 @@ pub mod gates {
     pub const IRONGATE: &str = "ironGate";
     /// sporeGate — cascade origin, depot source.
     pub const SPOREGATE: &str = "sporeGate";
+    /// eastGate — overwatch node.
+    pub const EASTGATE: &str = "eastGate";
+    /// blueGate — marine research node.
+    pub const BLUEGATE: &str = "blueGate";
 }
 
 #[cfg(test)]
@@ -219,6 +225,8 @@ mod tests {
             gates::STRANDGATE,
             gates::IRONGATE,
             gates::SPOREGATE,
+            gates::EASTGATE,
+            gates::BLUEGATE,
         ];
         for (i, a) in all.iter().enumerate() {
             for b in &all[i + 1..] {

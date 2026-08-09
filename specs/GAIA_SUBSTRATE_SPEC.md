@@ -1,9 +1,10 @@
 # gAIa Substrate Specification
 
-**Date**: 2026-08-08 (Wave 157a)
+**Date**: 2026-08-09 (Wave 157a — VERTEBRATE EVOLUTION self-audit)
 **Status**: Design — implementation in progress
 **Upstream**: whitePaper gen0-gen4 (gAIa vision, sunCloud economics, sovereignty stack)
 **Local**: projectFOUNDATION (gAIa substrate library)
+**Self-audit**: Method names verified against live primal capability.list on ironGate (Aug 9, 2026)
 
 ## Purpose
 
@@ -33,16 +34,26 @@ Layer 0: nestGate CAS           — content identity (BLAKE3)
 
 ### Layer mapping to FOUNDATION crates
 
-| Layer | Crate | Status | Description |
-|-------|-------|--------|-------------|
+Method names verified against live primal `capability.list` on ironGate (Aug 9, 2026).
+
+| Layer | Crate | Status | Actual RPC methods used |
+|-------|-------|--------|-------------------------|
 | 0 | `foundation-fetch` | LIVE | BLAKE3 content addressing, artifact registry |
-| 1 | `foundation-ipc` | LIVE | rhizoCrypt `session.create`, `entry.append` |
-| 2 | `foundation-ipc` | LIVE | loamSpine `certificate.create`, `spine.append` |
-| 3 | `foundation-ipc` | LIVE | sweetGrass `braid.create`, `braid.weave` |
-| 4 | `foundation-ipc` | LIVE | BearDog `auth.issue_session`, Ed25519 signing |
-| 5 | `foundation-anchor` | DESIGN | Merkle root aggregation + public chain publish |
-| 6 | `foundation-publish` | DESIGN | sunCloud radiating attribution calculation |
-| 0+ | `foundation-ipc` | DESIGN | CAS federation `content.locate` cross-gate |
+| 1 | `foundation-ipc` | LIVE | rhizoCrypt `dag.session.create`, `dag.event.append`, `dag.session.tree_hash` |
+| 2 | `foundation-ipc` | LIVE | loamSpine `spine.create`, `entry.append`, `session.commit` |
+| 3 | `foundation-ipc` | LIVE | loamSpine `braid.commit` (sweetGrass requires riboCipher signal) |
+| 4 | `foundation-ipc` | LIVE | BearDog `crypto.sign_ed25519`, `crypto.verify_ed25519` |
+| 5 | `foundation-anchor` | LIVE types, DESIGN chain backends | loamSpine `anchor.publish`, `anchor.publish_batch`, `anchor.verify` |
+| 6 | `foundation-publish` | LIVE attribution math, DESIGN braid reader | sunCloud radiating attribution calculation |
+| 0+ | `foundation-ipc` | LIVE types, DESIGN federation client | nestGate `content.resolve`, `content.replicate.pull` |
+
+### P0 impact on sovereignty stack (Wave 157a)
+
+| P0 | Layer | Impact on FOUNDATION | ironGate status |
+|----|-------|---------------------|-----------------|
+| P0-A (bearDog sign stub) | 4 | Depot binary is a stub; **ironGate is NOT affected** — local bearDog has real crypto (`crypto.sign_ed25519` returns proper param errors) | HEALTHY |
+| P0-B (nestGate API mismatch) | 0+ | `content.ingest` + `content.stat` not in capability list; method constants corrected to actual surface (`content.resolve`, `content.put`, `storage.stats`) | CORRECTED |
+| P0-C (biomeOS FD leak) | — | `capability.call` unusable; FOUNDATION uses direct UDS (unaffected) | UNAFFECTED |
 
 ## Layer 5: Public Ledger Anchoring
 
@@ -105,9 +116,15 @@ pub trait AnchorChain {
 
 1. `foundation validate` runs, producing loamSpine certificates
 2. Certificates accumulate in a local batch (configurable threshold, default 1000)
-3. `foundation anchor` triggers: builds Merkle tree, publishes root
-4. Receipt stored in nestGate CAS + loamSpine ledger entry
-5. Any party can verify: fetch batch from CAS, rebuild tree, check against chain
+3. `foundation anchor` triggers: builds Merkle tree via `foundation-anchor` crate
+4. Publishes root via loamSpine `anchor.publish` (or `anchor.publish_batch` for bulk)
+5. Receipt stored in nestGate CAS + loamSpine ledger entry
+6. Any party can verify: `anchor.verify` against the chain, fetch batch from CAS, rebuild tree
+
+Note: loamSpine already ships `anchor.publish`, `anchor.publish_batch`, and
+`anchor.verify` as live RPC methods (verified on ironGate Aug 9, 2026).
+The `foundation-anchor` crate's chain backend design can delegate to these
+rather than implementing raw BTC/ETH RPC directly.
 
 ## Layer 6: sunCloud Radiating Attribution
 
@@ -183,11 +200,11 @@ strandGate's compute memoization CAS.
 
 ```rust
 /// Locate content across the gate mesh.
-pub async fn content_locate(
+pub async fn content_resolve(
     client: &PrimalClient,
     hash: &[u8; 32],
 ) -> Result<Vec<GateLocation>, IpcError> {
-    // nestGate content.locate -> songBird federation -> mesh resolution
+    // nestGate content.resolve -> songBird federation -> mesh resolution
 }
 
 /// Pull content from a remote gate into local CAS.
@@ -201,6 +218,26 @@ pub async fn content_pull(
 }
 ```
 
+### Actual nestGate CAS surface (verified Aug 9, 2026)
+
+All content methods require BTSP authentication. Available methods:
+
+| Method | Purpose |
+|--------|---------|
+| `content.resolve` | Locate content by hash (federation lookup) |
+| `content.put` | Store content in CAS |
+| `content.get` | Retrieve content from CAS |
+| `content.exists` | Check if content exists |
+| `content.list` | List CAS contents |
+| `content.replicate.pull` | Pull from remote gate |
+| `content.publish` | Make content available for federation |
+| `content.push` | Push content to remote gate |
+| `storage.stats` | CAS statistics (object count, size, namespaces) |
+
+Note: `content.ingest` (directory walk) and `content.stat` (single-object stat)
+do NOT exist in nestGate v0.5.0 (P0-B). westGate pipeline adapted with Python
+directory walk + per-file `content.put`.
+
 ### Dependency
 
 NG-05 (nestGate TCP transport + content capability registration) must
@@ -210,9 +247,12 @@ ship before cross-gate federation is wired. westGate team owns NG-05.
 
 | Gate | Role | FOUNDATION interaction |
 |------|------|----------------------|
-| **westGate** | Data CAS (50 TB, 153 datasets) | `content.locate` discovers datasets; `content.pull` fetches to local CAS |
-| **strandGate** | Compute NFT (SU(3)/SU(4) memoization) | `content.locate` discovers cached configs; provenance braids carry compute attribution |
-| **ironGate** | Integration + publication node | Runs validation, builds Merkle trees, publishes anchors, calculates attribution |
+| **westGate** | Data CAS (50 TB ZFS, 153 datasets, 989K files braided) | `content.resolve` discovers datasets; `content.replicate.pull` fetches to local CAS |
+| **strandGate** | Compute NFT (SU(3)/SU(4) memoization) | `content.resolve` discovers cached configs; provenance braids carry compute attribution |
+| **ironGate** | Integration + publication node (NUCLEUS host) | Runs validation, builds Merkle trees, publishes anchors via loamSpine `anchor.publish`, calculates attribution |
+| **eastGate** | Overwatch node | Ecosystem audit, blurb distribution, self-audit coordination |
+| **blueGate** | Marine research node | Domain-specific CAS federation participant |
+| **sporeGate** | Cascade origin, depot source | golgi depot, binary distribution via `coord.depot.status` |
 
 ## Relationship to whitePaper Economics
 

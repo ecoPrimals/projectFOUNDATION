@@ -95,7 +95,7 @@ impl ProvenanceSession {
         if let Some(ls) = loamspine {
             match ls
                 .call_raw(
-                    crate::methods::entry::CREATE,
+                    crate::methods::spine::CREATE,
                     Some(json!({
                         "entry_type": "foundation_validation",
                         "session_name": session_name
@@ -146,7 +146,7 @@ impl ProvenanceSession {
         if let (Some(rc), Some(session_id)) = (rhizocrypt, &self.dag_session_id) {
             match rc
                 .call_raw(
-                    crate::methods::dag::SESSION_COMPLETE,
+                    crate::methods::dag::SESSION_TREE_HASH,
                     Some(json!({
                         "session_id": session_id,
                         "merkle_root": merkle_root
@@ -184,7 +184,7 @@ impl ProvenanceSession {
             if self.available.attribution {
                 match sg
                     .call_raw(
-                        crate::methods::braid::CREATE,
+                        crate::methods::braid::COMMIT,
                         Some(json!({
                             "session_id": self.dag_session_id,
                             "spine_entry_id": self.spine_entry_id,
