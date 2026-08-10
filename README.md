@@ -4,7 +4,7 @@ The gAIa substrate library — validated scientific lineage, sovereign
 publication, and radiating attribution for the ecoPrimals ecosystem.
 
 **Organization**: sporeGarden (products built on ecoPrimals)
-**Generation**: gen4 — composition and deployment (Wave 76+, evolved Wave 157a)
+**Generation**: gen4 — composition and deployment (Wave 76+, evolved Wave 157g)
 **License**: AGPL-3.0-or-later (code), ORC (system mechanics), CC-BY-SA 4.0 (docs)
 
 ## What This Is
@@ -126,12 +126,12 @@ target/release/foundation profiles --scan-dir ../../springs/hotSpring --spring h
 target/release/foundation check-versions --eco-root ../../ --json
 ```
 
-**Current state**: 7 crates, 254 tests, ~11.2k lines, zero clippy warnings.
-8 subcommands (9th `anchor` in design). Typed errors throughout. All constants
-centralized. IPC with graceful degradation. Zero-copy env expansion and observation
-types. Ecosystem health dashboard model. GuideStone boundary spec. CAS federation
-client patterns for cross-gate `content.locate` (westGate data + strandGate compute).
-Two external deps eliminated this wave (`bytes`, `walkdir` replaced with `std`).
+**Current state**: 7 crates, 258 tests, ~11.5k lines, zero clippy warnings.
+8 subcommands (9th `anchor` in design). 48 RPC method constants across 12 modules,
+all verified against live primal `capability.list` (self-audit Wave 157a/157g).
+Typed errors throughout. All constants centralized. IPC with graceful degradation.
+CAS federation types for cross-gate `content.resolve` (westGate data + strandGate
+compute). `braid.verify` and `content.stat/ingest` constants added (Wave 157g closures).
 Env-driven URL resolution (no hardcoded service endpoints). Zero `unsafe` in
 production; test-only env manipulation isolated with `#[expect]` + mutex.
 

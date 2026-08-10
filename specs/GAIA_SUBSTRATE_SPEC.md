@@ -1,10 +1,11 @@
 # gAIa Substrate Specification
 
-**Date**: 2026-08-09 (Wave 157a — VERTEBRATE EVOLUTION self-audit)
+**Date**: 2026-08-10 (Wave 157g — ENMESH)
 **Status**: Design — implementation in progress
 **Upstream**: whitePaper gen0-gen4 (gAIa vision, sunCloud economics, sovereignty stack)
 **Local**: projectFOUNDATION (gAIa substrate library)
-**Self-audit**: Method names verified against live primal capability.list on ironGate (Aug 9, 2026)
+**Self-audit**: Method names verified against live primal surfaces on ironGate (Aug 9-10, 2026)
+**P0 status**: ALL CLOSED (Wave 157g). 0 P0, 0 P1, 2 P2.
 
 ## Purpose
 
@@ -34,26 +35,26 @@ Layer 0: nestGate CAS           — content identity (BLAKE3)
 
 ### Layer mapping to FOUNDATION crates
 
-Method names verified against live primal `capability.list` on ironGate (Aug 9, 2026).
+Method names verified against live primal surfaces on ironGate (Aug 9-10, 2026).
 
 | Layer | Crate | Status | Actual RPC methods used |
 |-------|-------|--------|-------------------------|
 | 0 | `foundation-fetch` | LIVE | BLAKE3 content addressing, artifact registry |
+| 0+ | `foundation-ipc` | LIVE types | nestGate `content.resolve`, `content.replicate.pull`, `content.stat`, `content.ingest` |
 | 1 | `foundation-ipc` | LIVE | rhizoCrypt `dag.session.create`, `dag.event.append`, `dag.session.tree_hash` |
 | 2 | `foundation-ipc` | LIVE | loamSpine `spine.create`, `entry.append`, `session.commit` |
-| 3 | `foundation-ipc` | LIVE | loamSpine `braid.commit` (sweetGrass requires riboCipher signal) |
-| 4 | `foundation-ipc` | LIVE | BearDog `crypto.sign_ed25519`, `crypto.verify_ed25519` |
+| 3 | `foundation-ipc` | LIVE | `braid.commit` (loamSpine), `braid.verify` (sweetGrass — method #48, Wave 157g) |
+| 4 | `foundation-ipc` | LIVE | BearDog `crypto.sign_ed25519`, `crypto.verify_ed25519` — P0-A CLOSED, real crypto confirmed |
 | 5 | `foundation-anchor` | LIVE types, DESIGN chain backends | loamSpine `anchor.publish`, `anchor.publish_batch`, `anchor.verify` |
 | 6 | `foundation-publish` | LIVE attribution math, DESIGN braid reader | sunCloud radiating attribution calculation |
-| 0+ | `foundation-ipc` | LIVE types, DESIGN federation client | nestGate `content.resolve`, `content.replicate.pull` |
 
-### P0 impact on sovereignty stack (Wave 157a)
+### P0 resolution (Wave 157g — all CLOSED)
 
-| P0 | Layer | Impact on FOUNDATION | ironGate status |
-|----|-------|---------------------|-----------------|
-| P0-A (bearDog sign stub) | 4 | Depot binary is a stub; **ironGate is NOT affected** — local bearDog has real crypto (`crypto.sign_ed25519` returns proper param errors) | HEALTHY |
-| P0-B (nestGate API mismatch) | 0+ | `content.ingest` + `content.stat` not in capability list; method constants corrected to actual surface (`content.resolve`, `content.put`, `storage.stats`) | CORRECTED |
-| P0-C (biomeOS FD leak) | — | `capability.call` unusable; FOUNDATION uses direct UDS (unaffected) | UNAFFECTED |
+| Former P0 | Resolution | FOUNDATION impact |
+|-----------|-----------|-------------------|
+| P0-A (bearDog sign stub) | esotericWebb V32b confirmed real Ed25519 active. Depot binary fixed. | Layer 4 fully operational on all gates |
+| P0-B (nestGate API mismatch) | nestGate `60ee88d8` shipped `content.stat/ingest/query/fetch` + `dataset.convergence`. HTTP transport parity. | Method constants updated. CAS federation surface complete. |
+| P0-C (biomeOS FD leak) | Process leak CLOSED (coralReef RAII guards). biomeOS FD fix pending. | FOUNDATION uses direct UDS — unaffected |
 
 ## Layer 5: Public Ledger Anchoring
 
@@ -269,11 +270,46 @@ ship before cross-gate federation is wired. westGate team owns NG-05.
 
 ## Implementation Priority
 
-1. **foundation-anchor** crate scaffold + Merkle tree construction (pure, testable)
-2. **CAS federation** client in foundation-ipc (depends on NG-05)
-3. **sunCloud attribution** module in foundation-publish (depends on sweetGrass braid format)
+### Completed (Wave 157a-157g)
+
+1. **foundation-anchor** crate scaffold — Merkle tree construction, batch aggregation,
+   mock chain backend, receipt types (27 tests)
+2. **sunCloud attribution** module — `calculate_attribution`, metabolic schedule,
+   distribution manifests, gAIa commons reversion (16 tests)
+3. **CAS federation** types — `GateLocation`, `LocateResult`, `PullReceipt`, `CasStats`,
+   gate constants for 6 gates (8 tests)
+4. **Method self-audit** — all RPC constants verified against live primal capability.list.
+   48 method constants across 12 modules.
+
+### Next (Pipeline Enmeshment Phase — Wave 157g)
+
+1. **CAS federation client** — wire `content.resolve` + `content.replicate.pull` through
+   BTSP-authenticated nestGate channel. Depends on gossip mesh enmeshment (TCP 7800
+   cross-gate reachability + songBird MeshRelay).
+2. **foundation-anchor chain backends** — delegate to loamSpine `anchor.publish` /
+   `anchor.verify` rather than raw BTC/ETH RPC. loamSpine already ships these methods.
+3. **Braid verification integration** — wire `braid.verify` (sweetGrass method #48)
+   into the provenance commit workflow. Enables atomic verification of attribution chains.
 4. **CLI integration**: `foundation anchor` + `foundation publish --attribution`
-5. **End-to-end**: validate -> anchor -> attribute -> distribute
+5. **E2E pipeline**: validate -> anchor -> attribute -> distribute (Science pipeline G71)
+
+### ironGate Role in Enmeshment
+
+ironGate is the "downstream host + NFT" gate in the blurb. FOUNDATION's role:
+- **Validation hub**: Run foundation validate against data pulled from westGate CAS
+- **Publication bridge**: esotericWebb, footPrint, pseudoSpore bundles
+- **Anchor node**: Build Merkle trees from validation results, anchor to public ledger
+- **Attribution calculator**: Read braids from validation runs, calculate distribution
+
+### Dependencies on Other Teams
+
+| Dependency | Owner | Status |
+|-----------|-------|--------|
+| Gossip mesh cross-gate TCP 7800 | All gates | OPEN — peers unreachable |
+| songBird MeshRelay | songBird | OPEN — not yet shipped |
+| BTSP auth flow for nestGate content methods | nestGate + bearDog | LIVE (bearDog BTSP functional) |
+| `biome.yaml` manifest convergence | toadStool + biomeOS | 4 structs → 1 canonical |
+| sourDough CI wiring | sporeGate + sourDough | OPEN — 12 validators exist, none in post-receive hook |
 
 ---
 

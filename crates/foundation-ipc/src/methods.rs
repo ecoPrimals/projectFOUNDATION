@@ -70,13 +70,18 @@ pub mod session {
     pub const COMMIT: &str = "session.commit";
 }
 
-/// Braid / attribution methods (loamSpine hosts braid.commit).
+/// Braid / attribution methods.
 ///
-/// Note: sweetGrass requires riboCipher signal prefix for direct access.
-/// loamSpine exposes `braid.commit` as the primary integration surface.
+/// `braid.commit` lives on loamSpine (primary integration surface).
+/// `braid.verify` shipped on sweetGrass (method #48, Wave 157g).
+/// sweetGrass requires riboCipher signal prefix for direct access;
+/// loamSpine is the unauthenticated surface for braid operations.
 pub mod braid {
     /// Commit an attribution braid (DAG + spine + attestation).
     pub const COMMIT: &str = "braid.commit";
+    /// Verify a braid (content integrity + Ed25519 + ledger).
+    /// Shipped in sweetGrass `6357f0f` (Wave 157g). Capability-registered.
+    pub const VERIFY: &str = "braid.verify";
 }
 
 /// Anchor methods (loamSpine — Layer 5 public ledger anchoring).
@@ -100,8 +105,10 @@ pub mod family {
 
 /// Content-addressed storage methods (nestGate CAS).
 ///
-/// Verified against nestGate capability.list on ironGate (Aug 9, 2026).
-/// Method names aligned to actual shipped API (self-audit Wave 157a).
+/// Verified against nestGate on ironGate (Aug 9-10, 2026).
+/// Unauthenticated methods appear in capability.list.
+/// BTSP-gated methods (`stat`, `ingest`, `query`, `fetch`) exist behind auth
+/// — shipped in nestGate `60ee88d8` (Wave 157g).
 pub mod content {
     /// Resolve content location by BLAKE3 hash (mesh-wide lookup).
     pub const RESOLVE: &str = "content.resolve";
@@ -119,6 +126,18 @@ pub mod content {
     pub const PUBLISH: &str = "content.publish";
     /// Push content to a remote gate.
     pub const PUSH: &str = "content.push";
+    /// Stat a single content object (size, type, metadata).
+    /// Shipped in nestGate `60ee88d8` (BTSP-gated).
+    pub const STAT: &str = "content.stat";
+    /// Ingest a directory tree into CAS (recursive walk + put).
+    /// Shipped in nestGate `60ee88d8` (BTSP-gated). Closes P0-B.
+    pub const INGEST: &str = "content.ingest";
+    /// Query content by metadata predicates.
+    /// Shipped in nestGate `60ee88d8` (BTSP-gated).
+    pub const QUERY: &str = "content.query";
+    /// Fetch content from external source into CAS.
+    /// Shipped in nestGate `60ee88d8` (BTSP-gated).
+    pub const FETCH: &str = "content.fetch";
 }
 
 /// Storage methods (nestGate low-level storage layer).
@@ -129,10 +148,30 @@ pub mod storage {
     pub const NAMESPACES_LIST: &str = "storage.namespaces.list";
 }
 
+/// Dataset methods (nestGate — data management layer).
+///
+/// Shipped in nestGate `60ee88d8` (Wave 157g, BTSP-gated).
+pub mod dataset {
+    /// Check convergence state across federated CAS copies.
+    pub const CONVERGENCE: &str = "dataset.convergence";
+}
+
+/// Gossip methods (swarmVine mesh — injected by primals).
+///
+/// rhizoCrypt, loamSpine, lithoSpore inject gossip (3/16 live, Wave 157g).
+/// barraCuda spec'd (20 keys, hooks pending).
+pub mod gossip {
+    /// Spread a gossip event to the mesh.
+    pub const SPREAD: &str = "gossip.spread";
+    /// Inject a gossip event via UDS.
+    pub const INJECT: &str = "gossip.inject";
+}
+
 /// Crypto methods (bearDog).
 ///
 /// Verified against bearDog capability.list on ironGate (Aug 9, 2026).
-/// Note: P0-A reports depot binary may be a stub — verify signing works.
+/// P0-A (depot stub) RESOLVED — esotericWebb V32b confirmed real Ed25519 active.
+/// ironGate bearDog has functional crypto (verified Aug 9).
 pub mod crypto {
     /// Sign data with Ed25519.
     pub const SIGN_ED25519: &str = "crypto.sign_ed25519";
@@ -176,6 +215,7 @@ mod tests {
             entry::LIST,
             session::COMMIT,
             braid::COMMIT,
+            braid::VERIFY,
             anchor::PUBLISH,
             anchor::PUBLISH_BATCH,
             anchor::VERIFY,
@@ -187,8 +227,15 @@ mod tests {
             content::REPLICATE_PULL,
             content::PUBLISH,
             content::PUSH,
+            content::STAT,
+            content::INGEST,
+            content::QUERY,
+            content::FETCH,
             storage::STATS,
             storage::NAMESPACES_LIST,
+            dataset::CONVERGENCE,
+            gossip::SPREAD,
+            gossip::INJECT,
             crypto::SIGN_ED25519,
             crypto::VERIFY_ED25519,
             crypto::BLAKE3_HASH,
@@ -242,9 +289,25 @@ mod tests {
             content::REPLICATE_PULL,
             content::PUBLISH,
             content::PUSH,
+            content::STAT,
+            content::INGEST,
+            content::QUERY,
+            content::FETCH,
         ] {
             assert!(m.starts_with("content."), "'{m}' must start with content.");
         }
+    }
+
+    #[test]
+    fn braid_methods_share_prefix() {
+        assert!(braid::COMMIT.starts_with("braid."));
+        assert!(braid::VERIFY.starts_with("braid."));
+    }
+
+    #[test]
+    fn gossip_methods_share_prefix() {
+        assert!(gossip::SPREAD.starts_with("gossip."));
+        assert!(gossip::INJECT.starts_with("gossip."));
     }
 
     #[test]
