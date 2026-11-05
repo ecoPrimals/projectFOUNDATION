@@ -4,8 +4,15 @@ The gAIa substrate library — validated scientific lineage, sovereign
 publication, and radiating attribution for the ecoPrimals ecosystem.
 
 **Organization**: sporeGarden (products built on ecoPrimals)
-**Generation**: gen4 — composition and deployment (Wave 76+, evolved Wave 157g)
+**Generation**: gen4 — composition and deployment (Wave 76+, evolved Wave 157g → Wave 200+)
 **License**: AGPL-3.0-or-later (code), ORC (system mechanics), CC-BY-SA 4.0 (docs)
+
+> **Wave 200+ reconciliation (2026-11-04)**: Sovereignty COMPLETE. The organism now serves
+> its own science sovereign: dromedary TLS on 7 subdomains, sporePrint 382 pages + 836
+> papers, 21 sweetGrass braids, REEDit unified surface, Nostr + RSS federation.
+> golgi VPS DOWN — cellMembrane DEPRECATED. Cloudflare DEPRECATED. LAN is just LAN.
+> projectFOUNDATION's data catalog, provenance pipeline, and publication bridge now
+> operate entirely on local eastGate infrastructure. No external dependencies.
 
 ## What This Is
 
@@ -34,10 +41,11 @@ economically distributed along sweetGrass braids.
                                      │
                     ┌────────────────┼────────────────┐
                     │                │                │
-              westGate          strandGate        ironGate
-           (data CAS:        (compute NFT:     (NUCLEUS host:
-            50 TB ZFS,        SU(3)/SU(4),      integration +
-            153 datasets)     memoized configs)  publication)
+              eastGate          strandGate        ironGate
+           (brain+gut:       (compute NFT:     (NUCLEUS host:
+            17 primals,       SU(3)/SU(4),      integration +
+            96GB DDR5,        memoized configs)  publication)
+            RTX 4070)
 ```
 
 projectNUCLEUS defines HOW to deploy (primals, graphs, gates).
@@ -147,14 +155,13 @@ production; test-only env manipulation isolated with `#[expect]` + mutex.
 trio, `backfill --write` TOML mutation, database-specific fetch orchestration, sporePrint
 notify trigger from `publish`.
 
-### Bash pipeline (canonical — production, pre-Phase C cutover)
+### Bash pipeline (legacy — pre-Phase C cutover)
 
 ```bash
-# 1. Deploy NUCLEUS composition (via projectNUCLEUS)
-cd "${NUCLEUS_ROOT:-${ECOPRIMALS_ROOT}/projectNUCLEUS}/deploy"
-bash deploy.sh --composition nest --gate <active-gate>
+# NUCLEUS primals already running on eastGate (17/17 via systemd)
+# No VPS deployment needed — golgi is DOWN, eastGate runs everything
 
-# 2. Fetch public data sources and run validation with full provenance
+# Fetch public data sources and run validation with full provenance
 cd "${FOUNDATION_ROOT:-$(git rev-parse --show-toplevel)}/deploy"
 bash foundation_validate.sh --thread wcm
 ```
@@ -165,6 +172,21 @@ executes validation workloads through toadStool, and commits the complete
 provenance chain (rhizoCrypt DAG + loamSpine ledger + sweetGrass braid).
 
 See `deploy/README.md` for full options and the sediment layer model.
+
+### Current Publication Surfaces (Wave 200+)
+
+The organism now publishes its science sovereign — no external hosting:
+
+| Surface | URL | Content |
+|---------|-----|---------|
+| sporePrint | `sporeprint.primals.eco` | 382 pages, 836 papers — all via dromedary TLS |
+| hypothesis | `hypothesis.primals.eco` | 52 formal hypotheses with falsification |
+| detroit | `detroit.primals.eco` | 600+ pages municipal data investigation |
+| tuebor | `tuebor.primals.eco` | 35 pages state-level analysis |
+| REEDit | `primals.eco/reedit.html` | Unified surface — living tips of 21 sweetGrass braids |
+| RSS | `primals.eco/feed.xml` | 1,560 items, WebSub/PubSubHubbub real-time |
+| Nostr | NIP-05 verified | gaia@primals.eco + ecoPrimal@primals.eco |
+| Tor | `.onion` hidden service | Censorship-resistant mirror of all surfaces |
 
 ## The Sovereignty Stack
 
@@ -214,12 +236,13 @@ sporeprint/           Gallery content (handing off to lithoSpore)
 
 | Repo | Org | Relationship |
 |------|-----|-------------|
-| **lithoSpore** | sporeGarden | First Targeted GuideStone — USB-deployable LTEE validation artifact built from foundation threads 1, 2, 4, 7 |
-| **projectNUCLEUS** | sporeGarden | The spore — deploys primals, produces gap handbacks that settle here as geological record |
-| **plasmidBin** | ecoPrimals/infra | Binary depot — foundation validation runs use primals from here |
+| **lithoSpore** | sporeGarden | First Targeted GuideStone — USB-deployable LTEE validation artifact |
+| **projectNUCLEUS** | sporeGarden | The spore — deploys 17 primals, gate inventory, sovereignty infrastructure |
+| **plasmidBin** | ecoPrimals/infra | Binary depot — 17 primal binaries fetched by nucleus-deploy |
 | **primalSpring** | syntheticChemistry | Composition validation — foundation references validated graphs |
 | **wateringHole** | ecoPrimals/infra | Standards and guidance — foundation follows these |
-| **whitePaper** | ecoPrimals/infra | gAIa vision, sunCloud economics, sovereignty stack design (gen0-gen4) |
+| **whitePaper** | ecoPrimals/infra | gAIa vision, sunCloud economics, sovereignty stack design |
 | **helixVision** | sporeGarden | Product focus — pulls Threads 1, 3, 4, 5 from foundation |
-| **blueFish** | sporeGarden (pending) | Product focus — pulls Thread 4 + data pipeline from foundation |
+| **blueFish** | sporeGarden (pending) | Product focus — pulls Thread 4 + data pipeline |
 | **esotericWebb** | sporeGarden | Product focus — pulls Thread 9 from foundation |
+| **dromedary** | ecoPrimals/primals | Sovereign TLS reverse proxy — serves all foundation publication surfaces |
